@@ -7,15 +7,18 @@ import android.util.JsonReader
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.database.CursorWindowCompat.create
+import androidx.core.util.Pair.create
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.*
 import com.ajpdk.androtalk.R
 import com.ajpdk.androtalk.tokenization.GPT2Tokenizer
 import kotlinx.coroutines.*
-import org.tensorflow.lite.InterpreterApi
+import org.tensorflow.lite.Interpreter
 import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.InputStreamReader
+import java.lang.ref.Cleaner.create
 import java.nio.channels.FileChannel
 import kotlin.math.exp
 import kotlin.random.Random
@@ -38,7 +41,7 @@ class GPT2Client(application: Application) : AndroidViewModel(application) {
     private val initJob: Job
     private var autocompleteJob: Job? = null
     private lateinit var tokenizer: GPT2Tokenizer
-    private lateinit var tflite: InterpreterApi
+    private lateinit var tflite: Interpreter
 
     private val prompts = arrayOf(
         "Before boarding your rocket to Mars, remember to pack these items",
@@ -132,15 +135,15 @@ class GPT2Client(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private suspend fun loadModel(): InterpreterApi = withContext(Dispatchers.IO) {
+    private suspend fun loadModel(): Interpreter = withContext(Dispatchers.IO) {
         val assetFileDescriptor = getApplication<Application>().assets.openFd(MODEL_PATH)
         assetFileDescriptor.use {
             val fileChannel = FileInputStream(assetFileDescriptor.fileDescriptor).channel
             val modelBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, it.startOffset, it.declaredLength)
 
-            val opts = InterpreterApi.Options()
+            val opts = Interpreter.Options()
             opts.setNumThreads(NUM_LITE_THREADS)
-            return@use InterpreterApi.create(modelBuffer, opts)
+            return@use Interpreter(modelBuffer, opts)
         }
     }
 

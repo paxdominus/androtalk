@@ -26,7 +26,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="30dp"
-            app:icon="@drawable/common_full_open_on_phone"
+            app:icon="@drawable/ic_launcher_background"
             android:onClick="@{() -> vm.refreshPrompt()}"/>
 
         <com.google.android.material.button.MaterialButton
