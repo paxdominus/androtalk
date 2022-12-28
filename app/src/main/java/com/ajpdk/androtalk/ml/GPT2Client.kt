@@ -49,7 +49,9 @@ class GPT2Client(application: Application) : AndroidViewModel(application) {
     )
 
     private val _prompt = MutableLiveData(prompts.random())
+
     val prompt: LiveData<String> = _prompt
+
 
     private val _completion = MutableLiveData("")
     val completion: LiveData<String> = _completion
